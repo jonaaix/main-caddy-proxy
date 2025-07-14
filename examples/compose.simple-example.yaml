@@ -1,0 +1,14 @@
+services:
+    my-app:
+        image: your-app-image
+        networks:
+            - main-proxy
+        labels:
+            # Canonical domain (non-www)
+            caddy: example.com
+            # Reverse proxy to this container's port 9000
+            caddy.reverse_proxy: "{{upstreams 9000}}"
+            # Include www domain
+            caddy.www.example.com: www.example.com
+            # Redirect www to non-www with HTTPS
+            caddy.www.example.com.redir: https://example.com{uri}

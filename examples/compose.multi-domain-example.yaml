@@ -1,0 +1,21 @@
+services:
+    my-app:
+        image: your-app-image
+        networks:
+            - main-proxy
+        labels:
+            # Primary domain
+            caddy: example.com
+            caddy.reverse_proxy: "{{upstreams 9000}}"
+
+            # www redirect for example.com
+            caddy.www.example.com: www.example.com
+            caddy.www.example.com.redir: https://example.com{uri}
+
+            # Second domain
+            caddy.second.com: second.com
+            caddy.second.com.reverse_proxy: "{{upstreams 9000}}"
+
+            # www redirect for second.com
+            caddy.www.second.com: www.second.com
+            caddy.www.second.com.redir: https://second.com{uri}

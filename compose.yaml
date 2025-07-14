@@ -1,0 +1,31 @@
+# IMPORTANT before start: Create global docker network using:
+# $ docker network create main-proxy
+
+services:
+    caddy:
+        image: lucaslorentz/caddy-docker-proxy:ci-alpine
+        container_name: main-caddy-proxy
+        restart: unless-stopped
+        ports:
+            # HTTP/1.1 and HTTP/2
+            - "80:80/tcp"
+            - "443:443/tcp"
+            # HTTP/3 (QUIC)
+            - "443:443/udp"
+        volumes:
+            # Persistent data for certificates, etc.
+            - ./volumes/caddy_data:/data
+            - ./volumes/caddy_config:/config
+            # Docker socket to discover running containers dynamically
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        environment:
+            # Email used for Let's Encrypt certificate registration
+            - CADDY_DOCKER_EMAIL=info@company.com
+            # Restrict automatic discovery to this Docker network
+            - CADDY_INGRESS_NETWORKS=main-proxy
+        networks:
+            - main-proxy
+
+networks:
+    main-proxy:
+        external: true

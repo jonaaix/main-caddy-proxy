@@ -1,0 +1,25 @@
+services:
+    caddy:
+        image: lucaslorentz/caddy-docker-proxy:ci-alpine
+        container_name: main-caddy-proxy
+        restart: unless-stopped
+        ports:
+            - "80:80/tcp"
+            - "443:443/tcp"
+            - "443:443/udp"
+        volumes:
+            - ./volumes/caddy_data:/data
+            - ./volumes/caddy_config:/config
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./Caddyfile:/etc/caddy/Caddyfile
+            # Mount the local PHP app directory
+            - /var/www/myapp:/srv/myapp:ro
+        environment:
+            - CADDY_DOCKER_EMAIL=info@yourcompany.com
+            - CADDY_INGRESS_NETWORKS=main-proxy
+        networks:
+            - main-proxy
+
+networks:
+    main-proxy:
+        external: true

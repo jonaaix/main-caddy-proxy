@@ -1,0 +1,5 @@
+app.yourdomain.com {
+  root * /srv/myapp
+  php_fastcgi host.docker.internal:9000
+  file_server
+}
