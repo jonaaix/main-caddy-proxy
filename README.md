@@ -24,7 +24,7 @@ box.
 ### 1️⃣ Clone this repository
 
 ```sh
-git clone --depth=1 --branch=main https://github.com/your-org/main-caddy-proxy.git \
+git clone --depth=1 --branch=main https://github.com/jonaaix/main-caddy-proxy.git \
 && rm -rf ./main-caddy-proxy/.git
 ```
 
