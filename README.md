@@ -85,14 +85,11 @@ services:
       networks:
          - main-proxy
       labels:
-         # Canonical domain
-         caddy: example.com
-         # Reverse proxy to container port 9000
-         caddy.reverse_proxy: "{{upstreams 9000}}"
-         # Include www domain
-         caddy.www.example.com: www.example.com
-         # Redirect www to non-www
-         caddy.www.example.com.redir: https://example.com{uri}
+         caddy_0: example.com, www.example.com
+         caddy_0.reverse_proxy: "{{upstreams 9000}}"
+         
+         caddy_1: mydomain.com
+         caddy_1.reverse_proxy: "{{upstreams 8080}}"
 
 networks:
    main-proxy:
