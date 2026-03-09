@@ -12,3 +12,5 @@ services:
             caddy.www.example.com: www.example.com
             # Redirect www to non-www with HTTPS
             caddy.www.example.com.redir: https://example.com{uri}
+            # Enable gzip and zstd compression
+            caddy.encode: zstd gzip

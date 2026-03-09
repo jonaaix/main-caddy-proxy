@@ -8,6 +8,9 @@ services:
             caddy: example.com
             caddy.reverse_proxy: "{{upstreams 9000}}"
 
+            # Enable gzip and zstd compression
+            caddy.encode: zstd gzip
+
             # www redirect for example.com
             caddy.www.example.com: www.example.com
             caddy.www.example.com.redir: https://example.com{uri}

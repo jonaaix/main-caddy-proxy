@@ -87,9 +87,11 @@ services:
       labels:
          caddy_0: example.com, www.example.com
          caddy_0.reverse_proxy: "{{upstreams 9000}}"
+         caddy_0.encode: zstd gzip
          
          caddy_1: mydomain.com
          caddy_1.reverse_proxy: "{{upstreams 8080}}"
+         caddy_1.encode: zstd gzip
 
 networks:
    main-proxy:
@@ -112,6 +114,9 @@ services:
          # Primary domain
          caddy: example.com
          caddy.reverse_proxy: "{{upstreams 9000}}"
+         
+         # Enable gzip and zstd compression
+         caddy.encode: zstd gzip
 
          # www redirect for example.com
          caddy.www.example.com: www.example.com
@@ -144,6 +149,8 @@ services:
          caddy: "*"
          # Reverse proxy to container port 9000
          caddy.reverse_proxy: "{{upstreams 9000}}"
+         # Enable gzip and zstd compression
+         caddy.encode: zstd gzip
 ```
 
 ⚠️ **Important Notes:**
