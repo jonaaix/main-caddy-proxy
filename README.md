@@ -75,7 +75,7 @@ Attach your services to the `main-proxy` network and declare domains via Docker 
 
 ### Example: Single domain with www redirect
 
-This example routes both `example.com` and `www.example.com` to the same container and redirects www to the non-www
+This example routes `example.com` to the container and redirects `www.example.com` to the non-www
 canonical URL:
 
 ```yaml
@@ -85,13 +85,16 @@ services:
       networks:
          - main-proxy
       labels:
-         caddy_0: example.com, www.example.com
+         caddy_0: example.com
          caddy_0.reverse_proxy: "{{upstreams 9000}}"
          caddy_0.encode: zstd gzip
          
-         caddy_1: mydomain.com
-         caddy_1.reverse_proxy: "{{upstreams 8080}}"
-         caddy_1.encode: zstd gzip
+         caddy_1: www.example.com
+         caddy_1.redir: https://example.com{uri}
+         
+         caddy_2: mydomain.com
+         caddy_2.reverse_proxy: "{{upstreams 8080}}"
+         caddy_2.encode: zstd gzip
 
 networks:
    main-proxy:
@@ -111,24 +114,20 @@ services:
       networks:
          - main-proxy
       labels:
-         # Primary domain
-         caddy: example.com
-         caddy.reverse_proxy: "{{upstreams 9000}}"
+         # Primary domains
+         caddy_0: example.com, second.com
+         caddy_0.reverse_proxy: "{{upstreams 9000}}"
          
          # Enable gzip and zstd compression
-         caddy.encode: zstd gzip
+         caddy_0.encode: zstd gzip
 
          # www redirect for example.com
-         caddy.www.example.com: www.example.com
-         caddy.www.example.com.redir: https://example.com{uri}
-
-         # Second domain
-         caddy.second.com: second.com
-         caddy.second.com.reverse_proxy: "{{upstreams 9000}}"
+         caddy_1: www.example.com
+         caddy_1.redir: https://example.com{uri}
 
          # www redirect for second.com
-         caddy.www.second.com: www.second.com
-         caddy.www.second.com.redir: https://second.com{uri}
+         caddy_2: www.second.com
+         caddy_2.redir: https://second.com{uri}
 ```
 
 ---
@@ -146,19 +145,19 @@ services:
          - main-proxy
       labels:
          # Match any domain
-         caddy: "*"
+         caddy_0: "*"
          # Reverse proxy to container port 9000
-         caddy.reverse_proxy: "{{upstreams 9000}}"
+         caddy_0.reverse_proxy: "{{upstreams 9000}}"
          # Enable gzip and zstd compression
-         caddy.encode: zstd gzip
+         caddy_0.encode: zstd gzip
 ```
 
 ⚠️ **Important Notes:**
 
-- For Let's Encrypt to issue certificates, each custom domain **must** have DNS A/AAAA records pointing to your server.
-- Caddy will automatically request and maintain certificates for all discovered hostnames.
-- You can optionally restrict accepted domains with Caddyfile configuration or advanced label rules if you don’t want
-  truly everything proxied.
+* For Let's Encrypt to issue certificates, each custom domain **must** have DNS A/AAAA records pointing to your server.
+* Caddy will automatically request and maintain certificates for all discovered hostnames.
+* You can optionally restrict accepted domains with Caddyfile configuration or advanced label rules if you don’t want
+truly everything proxied.
 
 ---
 
@@ -172,24 +171,24 @@ docker compose up -d
 
 Within seconds, Caddy will:
 
-- Discover the container
-- Issue certificates
-- Configure routing
-- Serve HTTPS and HTTP/3
+* Discover the container
+* Issue certificates
+* Configure routing
+* Serve HTTPS and HTTP/3
 
 ---
 
 ## 🛠️ Notes and Tips
 
-- Make sure your DNS records point to the host running Caddy.
-- If you want to enable additional headers, security settings, or rate limits, you can add further labels per container.
-- `compose.yaml` is **versionless** and uses the modern Compose spec (2025 compatible).
+* Make sure your DNS records point to the host running Caddy.
+* If you want to enable additional headers, security settings, or rate limits, you can add further labels per container.
+* `compose.yaml` is **versionless** and uses the modern Compose spec (2025 compatible).
 
 ---
 
 ## 🗂️ Project Structure
 
-```
+```text
 main-caddy-proxy
 ├── compose.yaml                   # Caddy proxy definition
 ├── README.md                      # This documentation
@@ -200,9 +199,7 @@ main-caddy-proxy
 
 ---
 
-✅ **Done!**  
-Your Caddy proxy is now ready to serve multiple domains with automatic HTTPS and HTTP/3.
-
+✅ **Done!** Your Caddy proxy is now ready to serve multiple domains with automatic HTTPS and HTTP/3.
 
 ---
 
@@ -214,21 +211,21 @@ You can route a domain to a local PHP application running on your host machine v
 
 Edit your `www.conf`:
 
-```
+```ini
 listen = 127.0.0.1:9000
 ```
 
 Restart PHP-FPM:
 
 ```sh
-sudo systemctl restart php7.4-fpm
+sudo systemctl restart php8.4-fpm
 ```
 
 #### 2️⃣ Create a `Caddyfile`
 
 Example:
 
-```
+```caddyfile
 app.yourdomain.com {
   root * /srv/myapp
   php_fastcgi host.docker.internal:9000
@@ -255,5 +252,3 @@ docker compose up -d
 ```
 
 Caddy will automatically issue a certificate and serve your PHP site via HTTPS.
-
----

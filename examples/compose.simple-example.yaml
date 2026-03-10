@@ -5,12 +5,13 @@ services:
             - main-proxy
         labels:
             # Canonical domain (non-www)
-            caddy: example.com
+            caddy_0: example.com
             # Reverse proxy to this container's port 9000
-            caddy.reverse_proxy: "{{upstreams 9000}}"
-            # Include www domain
-            caddy.www.example.com: www.example.com
-            # Redirect www to non-www with HTTPS
-            caddy.www.example.com.redir: https://example.com{uri}
+            caddy_0.reverse_proxy: "{{upstreams 9000}}"
             # Enable gzip and zstd compression
-            caddy.encode: zstd gzip
+            caddy_0.encode: zstd gzip
+
+            # Include www domain
+            caddy_1: www.example.com
+            # Redirect www to non-www with HTTPS
+            caddy_1.redir: https://example.com{uri}
